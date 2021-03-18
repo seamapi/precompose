@@ -73,6 +73,8 @@ def pack(
 
     with tempfile.TemporaryDirectory() as tempstr:
         tempdir = Path(tempstr)
+        tempdir.chmod(0o755)
+
         storage = tempdir.joinpath("storage")
         storage.mkdir()
         images = pull_images(compose_yaml, storage, arch, variant)
