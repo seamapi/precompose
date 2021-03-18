@@ -15,7 +15,7 @@ def check_services(compose_path: Path, compose_yaml: Any):
         raise RuntimeError(f"{compose_path} isn't a dict?!?")
 
     if "services" not in compose_yaml:
-        raise RuntimeError(f"no services service in {compose_path}?!?")
+        raise RuntimeError(f"no services key in {compose_path}?!?")
 
     if not isinstance(compose_yaml["services"], dict):
         raise RuntimeError(f"services in {compose_path} isn't a dict?!?")
@@ -23,7 +23,7 @@ def check_services(compose_path: Path, compose_yaml: Any):
     services: Dict[Any, Any] = compose_yaml["services"]
 
     if len(services) < 1:
-        raise RuntimeError(f"no services in {compose_path}?!?")
+        raise RuntimeError(f"no services defined in {compose_path}?!?")
 
     for service, service_data in services.items():
         if not isinstance(service, str):
