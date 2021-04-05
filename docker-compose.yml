@@ -1,0 +1,13 @@
+services:
+  holocron:
+    image: helloseam/holocron:latest
+    build: .
+    privileged: true
+    environment:
+      - OSTREE_REPO=${OSTREE_REPO:-/tmp/holocron-ostree}
+    tmpfs:
+      - /tmp
+      - /var/lib/containers/storage
+    volumes:
+      - ${HOME}/.docker:/root/.docker
+      - ${OSTREE_REPO:-/tmp/holocron-ostree}:${OSTREE_REPO:-/tmp/holocron-ostree}

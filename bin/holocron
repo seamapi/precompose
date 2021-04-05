@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [ -z "${OSTREE_REPO:-}" ] ; then
+  echo "Please set OSTREE_REPO!" >&2
+  exit 1
+fi
+
+workdir=$(pwd)
+
+cd "$(dirname "$0")/.." && exec docker-compose run --rm -v "$workdir:$workdir" -w "$workdir" holocron "$@"
