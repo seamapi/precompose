@@ -9,4 +9,4 @@ fi
 
 workdir=$(pwd)
 
-cd "$(dirname "$0")/.." && exec docker-compose run -v "$workdir:$workdir" -w "$workdir" holocron "$@"
+cd "$(dirname "$0")/.." && exec docker-compose run --rm -v "$workdir:$workdir" -w "$workdir" holocron "$@"

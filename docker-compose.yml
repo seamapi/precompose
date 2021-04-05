@@ -5,9 +5,9 @@ services:
     privileged: true
     environment:
       - OSTREE_REPO=${OSTREE_REPO:-/tmp/holocron-ostree}
+    tmpfs:
+      - /tmp
+      - /var/lib/containers/storage
     volumes:
-      - storage:/var/lib/containers/storage
+      - ${HOME}/.docker:/root/.docker
       - ${OSTREE_REPO:-/tmp/holocron-ostree}:${OSTREE_REPO:-/tmp/holocron-ostree}
-
-volumes:
-  storage:
