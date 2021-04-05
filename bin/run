@@ -7,4 +7,6 @@ if [ -z "${OSTREE_REPO:-}" ] ; then
   exit 1
 fi
 
-cd "$(dirname "$0")/.." && exec docker-compose run holocron "$@"
+workdir=$(pwd)
+
+cd "$(dirname "$0")/.." && exec docker-compose run -v "$workdir:$workdir" -w "$workdir" holocron "$@"
