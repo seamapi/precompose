@@ -1,9 +1,10 @@
 import json
+import shutil
 import tempfile
 
 from pathlib import Path
 from ruamel.yaml import YAML
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, List, Optional, cast
 
 from holocron.capture import capture_output
 
@@ -36,6 +37,19 @@ def check_services(compose_path: Path, compose_yaml: Any):
             raise RuntimeError(f"no image specified for {service}")
 
 
+def qualify_image(image: str) -> str:
+    if len(image.split("/")) < 2:
+        image = "library/" + image
+
+    if len(image.split("/")) < 3:
+        image = "registry-1.docker.io/" + image
+
+    if len(image.split(":")) < 2:
+        image += ":latest"
+
+    return image
+
+
 def pull_images(compose_yaml: Any, storage: Path, arch: str, variant: Optional[str]):
     pulls = set([service["image"] for service in compose_yaml["services"].values()])
     images: Dict[str, str] = {}
@@ -45,14 +59,18 @@ def pull_images(compose_yaml: Any, storage: Path, arch: str, variant: Optional[s
         pull_args += ["--variant", variant]
 
     for pull in pulls:
-        images[pull] = capture_output(
+        qualified = qualify_image(pull)
+        basename = qualified.rsplit(":", 1)[0]
+        sha256 = capture_output(
             "podman",
             "pull",
             "--root",
             str(storage),
             *pull_args,
-            pull,
+            qualified,
         )
+
+        images[pull] = f"{basename}@sha256:{sha256}"
 
     return images
 
@@ -78,10 +96,15 @@ def pack(
         storage = tempdir.joinpath("storage")
         storage.mkdir()
         images = pull_images(compose_yaml, storage, arch, variant)
+        env_files: List[str] = []
 
-        for service in compose_yaml["services"]:
-            image = compose_yaml["services"][service]["image"]
-            compose_yaml["services"][service]["image"] = images[image]
+        for service in compose_yaml["services"].values():
+            service["image"] = images[service["image"]]
+            if "env_file" in service:
+                if isinstance(service["env_file"], list):
+                    env_files += service["env_file"]
+                else:
+                    env_files.append(service["env_file"])
 
         app = tempdir.joinpath(compose_path.parent.name)
         app.mkdir()
@@ -89,6 +112,11 @@ def pack(
         new_compose_path = app.joinpath("docker-compose.yml")
         with open(new_compose_path, "w") as compose_out:
             cast(Any, yaml).dump(compose_yaml, compose_out)
+
+        for env_file in env_files:
+            shutil.copyfile(
+                compose_path.parent.joinpath(env_file), app.joinpath(env_file)
+            )
 
         metadata = tempdir.joinpath("holocron.json")
         with open(metadata, "w") as metadata_out:
