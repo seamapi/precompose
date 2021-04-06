@@ -4,6 +4,9 @@ services:
     build: .
     privileged: true
     environment:
+      - GPG_PASSPHRASE=${GPG_PASSPHRASE:-}
+      - GPG_PRIVATE_KEY=${GPG_PRIVATE_KEY:-}
+      - GPG_KEY_ID=${GPG_KEY_ID:-}
       - HOLOCRON_ARCH=${HOLOCRON_ARCH:-}
       - HOLOCRON_VARIANT=${HOLOCRON_VARIANT:-}
       - OSTREE_REPO=${OSTREE_REPO:-/tmp/holocron-ostree}
