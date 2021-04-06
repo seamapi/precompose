@@ -51,6 +51,10 @@ def parse_argv(argv: List[str]) -> argparse.Namespace:
     elif "OSTREE_REPO" in os.environ:
         args.repo = os.environ["OSTREE_REPO"]
 
+    if args.sign_by is None:
+        if "GPG_KEY_ID" in os.environ and len(os.environ["GPG_KEY_ID"]) > 0:
+            args.sign_by = os.getenv("GPG_KEY_ID")
+
     try:
         capture_output("ostree", "refs", suppress_stderr=True)
     except subprocess.CalledProcessError:
