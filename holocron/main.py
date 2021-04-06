@@ -73,7 +73,7 @@ def main(argv: List[str] = sys.argv[1:]) -> int:
         sys.stderr.write(str(e) + "\n")
         return 1
 
-    commit = print(pack(**vars(args)))
+    commit = pack(**vars(args))
     sys.stderr.write(f"Imported {args.compose} to {args.ref}\n")
     print(commit)
     return 0
