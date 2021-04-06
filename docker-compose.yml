@@ -4,6 +4,8 @@ services:
     build: .
     privileged: true
     environment:
+      - HOLOCRON_ARCH=${HOLOCRON_ARCH:-}
+      - HOLOCRON_VARIANT=${HOLOCRON_VARIANT:-}
       - OSTREE_REPO=${OSTREE_REPO:-/tmp/holocron-ostree}
     tmpfs:
       - /tmp

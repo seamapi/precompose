@@ -11,6 +11,12 @@ from holocron.capture import capture_output
 yaml = YAML()
 
 
+def evaluate_config(compose_path: Path):
+    return cast(Any, yaml).load(
+        capture_output("docker-compose", "-f", str(compose_path), "config")
+    )
+
+
 def check_services(compose_path: Path, compose_yaml: Any):
     if not isinstance(compose_yaml, dict):
         raise RuntimeError(f"{compose_path} isn't a dict?!?")
@@ -84,10 +90,12 @@ def pack(
     variant: Optional[str],
 ) -> str:
     compose_path = Path(compose).absolute()
+    compose_config = evaluate_config(compose_path)
+
     with open(compose_path, "r") as compose_in:
         compose_yaml = cast(Any, yaml).load(compose_in)
 
-    check_services(compose_path, compose_yaml)
+    check_services(compose_path, compose_config)
 
     with tempfile.TemporaryDirectory() as tempstr:
         tempdir = Path(tempstr)
@@ -95,11 +103,11 @@ def pack(
 
         storage = tempdir.joinpath("storage")
         storage.mkdir()
-        images = pull_images(compose_yaml, storage, arch, variant)
+        images = pull_images(compose_config, storage, arch, variant)
         env_files: List[str] = []
 
-        for service in compose_yaml["services"].values():
-            service["image"] = images[service["image"]]
+        for name, service in compose_config["services"].items():
+            compose_yaml["services"][name]["image"] = images[service["image"]]
             if "env_file" in service:
                 if isinstance(service["env_file"], list):
                     env_files += service["env_file"]
