@@ -1,1 +1,2 @@
+docker-compose==1.28.6
 ruamel.yaml==0.16.13
