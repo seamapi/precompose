@@ -108,9 +108,9 @@ def pack(
 
         for name, service in compose_config["services"].items():
             compose_yaml["services"][name]["image"] = images[service["image"]]
-            if "env_file" in service:
-                if isinstance(service["env_file"], list):
-                    env_files += service["env_file"]
+            if "env_file" in compose_yaml["services"][name]:
+                if isinstance(compose_yaml["services"][name]["env_file"], list):
+                    env_files += compose_yaml["services"][name]["env_file"]
                 else:
                     env_files.append(service["env_file"])
 
