@@ -12,7 +12,7 @@ on:
 name: Build holocron
 
 jobs:
-  manylinux:
+  build:
     runs-on: ubuntu-20.04
 
     steps:
@@ -36,8 +36,7 @@ jobs:
     if: github.event_name == 'push'
 
     needs:
-      - manylinux
-      - sdist
+      - build
 
     steps:
       - uses: actions/download-artifact@v2
