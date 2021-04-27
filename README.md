@@ -14,7 +14,6 @@ Distributing container images through an OSTree repository has some advantages, 
 - Any `env_file` referenced by your `docker-compose.yml`
 - A directory containing exploded copies of all the containers your application needs, which can be used as an [additional image store](https://www.redhat.com/sysadmin/image-stores-podman) with [Podman](https://podmain.io)
 
-
 ## Requirements
 
 In addition to the Python modules that it requires, `holocron` also needs some external tools to do its work:
