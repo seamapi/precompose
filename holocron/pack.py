@@ -56,11 +56,16 @@ def qualify_image(image: str) -> str:
     return image
 
 
-def pull_images(compose_yaml: Any, storage: Path, arch: str, variant: Optional[str]):
+def pull_images(
+    compose_yaml: Any, storage: Path, arch: Optional[str], variant: Optional[str]
+):
     pulls = set([service["image"] for service in compose_yaml["services"].values()])
     images: Dict[str, str] = {}
+    pull_args: List[str] = []
 
-    pull_args = ["--arch", arch]
+    if arch is not None:
+        pull_args += ["--arch", arch]
+
     if variant is not None:
         pull_args += ["--variant", variant]
 
@@ -86,7 +91,7 @@ def pack(
     compose: str,
     repo: str,
     sign_by: Optional[str],
-    arch: str,
+    arch: Optional[str],
     variant: Optional[str],
 ) -> str:
     compose_path = Path(compose).absolute()
