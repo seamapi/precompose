@@ -6,7 +6,7 @@ from pathlib import Path
 from ruamel.yaml import YAML
 from typing import Any, Dict, List, Optional, cast
 
-from holocron.capture import capture_output
+from precompose.capture import capture_output
 
 yaml = YAML()
 
@@ -131,10 +131,10 @@ def pack(
                 compose_path.parent.joinpath(env_file), app.joinpath(env_file)
             )
 
-        metadata = tempdir.joinpath("holocron.json")
+        metadata = tempdir.joinpath("precompose.json")
         with open(metadata, "w") as metadata_out:
             json.dump(
-                {"holocron": {"app": app.name, "version": 0, "images": images}},
+                {"precompose": {"app": app.name, "version": 0, "images": images}},
                 metadata_out,
             )
 
@@ -142,7 +142,7 @@ def pack(
             f"--repo={repo}",
             f"--branch={ref}",
             f"--tree=dir={tempdir}",
-            f"--subject=holocron of {app.name}",
+            f"--subject=precompose of {app.name}",
             f"--body-file={metadata}",
         ]
 

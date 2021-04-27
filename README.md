@@ -1,6 +1,6 @@
-# holocron
+# precompose
 
-`holocron` is a tool to import a [Compose](https://www.compose-spec.io/) application into an [OSTree](https://ostreedev.github.io/ostree/introduction/) repository.
+`precompose` is a tool to import a [Compose](https://www.compose-spec.io/) application into an [OSTree](https://ostreedev.github.io/ostree/introduction/) repository.
 
 Distributing container images through an OSTree repository has some advantages, compared to the use of a container registry:
 
@@ -8,7 +8,7 @@ Distributing container images through an OSTree repository has some advantages, 
 - If your host is also managed by OSTree and is based on the same OS as your containers, then images are also deduplicated at the file level against the host.
 - Updates are done at the file level, instead of at the layer level - this can save significant amounts of bandwidth when only one or a few files in a layer have changed.
 
-`holocron` produces an OSTree commit which contains:
+`precompose` produces an OSTree commit which contains:
 
 - Your original `docker-compose.yml`, rewritten to pin each image to a specific SHA
 - Any `env_file` referenced by your `docker-compose.yml`
@@ -16,30 +16,30 @@ Distributing container images through an OSTree repository has some advantages, 
 
 ## Requirements
 
-In addition to the Python modules that it requires, `holocron` also needs some external tools to do its work:
+In addition to the Python modules that it requires, `precompose` also needs some external tools to do its work:
 
 ### [Docker Compose](https://github.com/docker/compose)
 
-`holocron` actually does depend on this as a Python module, but only uses it as an external tool, since it does not have a stable API. It is used to preprocess the Compose file and interpolate any environment variables that may be present in the image name.
+While `docker-compose` can be installed from PyPI, `precompose` only uses it as an external tool, since it does not have a stable API. Because it is not used as a library, and because you may have obtained `docker-compose` from a place other than PyPI, it is not declared as a Python dependency of this module. It is used to preprocess the Compose file and interpolate any environment variables that may be present in the image name.
 
-`docker-compose` is also needed to run an application packaged with `holocron`.
+`docker-compose` is also needed to run an application packaged with `precompose`.
 
 ### [OSTree](https://github.com/ostreedev/ostree)
 
-`holocron` shells out to the `ostree` command-line tool in order to create its commits.
+`precompose` shells out to the `ostree` command-line tool in order to create its commits.
 
 ### [Podman](https://github.com/containers/podman)
 
-`holocron` shells out to `podman unshare` to simulate being root and to `podman pull --root` to pull container images.
+`precompose` shells out to `podman unshare` to simulate being root and to `podman pull --root` to pull container images.
 
 Your system must be configured in a way that `podman` can operate without root privileges (aka "rootless containers") - on most Debian and Ubuntu based systems, installing the `uidmap` package along with Podman should be enough. Your mileage may vary.
 
-`podman` is also needed to run an application packaged with `holocron`, since Docker does not have anything equivalent to an additional image store. It is strongly recommended to use version 3.0 or later of Podman; the APIs used by `docker-compose` are incomplete in earlier versions.
+`podman` is also needed to run an application packaged with `precompose`, since Docker does not have anything equivalent to an additional image store. It is strongly recommended to use version 3.0 or later of Podman; the APIs used by `docker-compose` are incomplete in earlier versions.
 
 ## Usage
 
 ```
-holocron [-h] [--repo OSTREE] [--sign-by KEYID] [--arch ARCH] [--variant VARIANT] BRANCH COMPOSE
+precompose [-h] [--repo OSTREE] [--sign-by KEYID] [--arch ARCH] [--variant VARIANT] BRANCH COMPOSE
 
 Import a Docker Compose application into ostree
 

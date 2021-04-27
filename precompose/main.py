@@ -8,8 +8,8 @@ import sys
 
 from typing import List
 
-from holocron.capture import capture_output
-from holocron.pack import pack
+from precompose.capture import capture_output
+from precompose.pack import pack
 
 
 def check_prequisites() -> None:
@@ -23,9 +23,16 @@ def check_prequisites() -> None:
         os.execlp("podman", "podman", "unshare", sys.executable, *sys.argv)
 
 
+def has_env(key: str):
+    if (key in os.environ) and (len(os.environ[key]) > 0):
+        return True
+    else:
+        return False
+
+
 def parse_argv(argv: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        prog="holocron", description="Import a Docker Compose application into ostree"
+        prog="precompose", description="Import a Docker Compose application into ostree"
     )
 
     parser.add_argument("ref", metavar="BRANCH", help="ostree branch to commit to")
@@ -37,18 +44,15 @@ def parse_argv(argv: List[str]) -> argparse.Namespace:
     args = parser.parse_args(argv)
 
     if args.arch is None:
-        if "HOLOCRON_ARCH" in os.environ and len(os.environ["HOLOCRON_ARCH"]) > 0:
-            args.arch = os.getenv("HOLOCRON_ARCH")
-        elif "CONTAINER_ARCH" in os.environ and len(os.environ["CONTAINER_ARCH"]) > 0:
+        if has_env("PRECOMPOSE_ARCH"):
+            args.arch = os.getenv("PRECOMPOSE_ARCH")
+        elif has_env("CONTAINER_ARCH"):
             args.arch = os.getenv("CONTAINER_ARCH")
 
     if args.variant is None:
-        if "HOLOCRON_VARIANT" in os.environ and len(os.environ["HOLOCRON_VARIANT"]) > 0:
-            args.variant = os.getenv("HOLOCRON_VARIANT")
-        elif (
-            "CONTAINER_VARIANT" in os.environ
-            and len(os.environ["CONTAINER_VARIANT"]) > 0
-        ):
+        if has_env("PRECOMPOSE_VARIANT"):
+            args.variant = os.getenv("PRECOMPOSE_VARIANT")
+        elif has_env("CONTAINER_VARIANT"):
             args.variant = os.getenv("CONTAINER_VARIANT")
 
     if args.repo is not None:
