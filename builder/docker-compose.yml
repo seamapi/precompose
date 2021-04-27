@@ -1,0 +1,11 @@
+services:
+  manylinux:
+    image: quay.io/pypa/manylinux2014_x86_64:latest
+    environment:
+      PLAT: manylinux1_x86_64
+      BUILDER_UID: ${BUILDER_UID:-1000}
+      BUILDER_GID: ${BUILDER_GID:-1000}
+    entrypoint: ["/mnt/builder/entrypoint.sh"]
+    working_dir: /mnt
+    volumes:
+      - ..:/mnt

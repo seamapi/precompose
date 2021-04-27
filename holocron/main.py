@@ -13,14 +13,14 @@ from holocron.pack import pack
 
 
 def check_prequisites() -> None:
-    if os.getuid() != 0:
-        raise RuntimeError("Must be run as root")
-
     if shutil.which("podman") is None:
         raise RuntimeError("podman not found in PATH")
 
     if shutil.which("ostree") is None:
         raise RuntimeError("ostree not found in PATH")
+
+    if os.getuid() != 0:
+        os.execlp("podman", "podman", "unshare", sys.executable, *sys.argv)
 
 
 def parse_argv(argv: List[str]) -> argparse.Namespace:
@@ -39,12 +39,17 @@ def parse_argv(argv: List[str]) -> argparse.Namespace:
     if args.arch is None:
         if "HOLOCRON_ARCH" in os.environ and len(os.environ["HOLOCRON_ARCH"]) > 0:
             args.arch = os.getenv("HOLOCRON_ARCH")
-        else:
-            raise RuntimeError("--arch not specified and HOLOCRON_ARCH not set")
+        elif "CONTAINER_ARCH" in os.environ and len(os.environ["CONTAINER_ARCH"]) > 0:
+            args.arch = os.getenv("CONTAINER_ARCH")
 
     if args.variant is None:
         if "HOLOCRON_VARIANT" in os.environ and len(os.environ["HOLOCRON_VARIANT"]) > 0:
             args.variant = os.getenv("HOLOCRON_VARIANT")
+        elif (
+            "CONTAINER_VARIANT" in os.environ
+            and len(os.environ["CONTAINER_VARIANT"]) > 0
+        ):
+            args.variant = os.getenv("CONTAINER_VARIANT")
 
     if args.repo is not None:
         os.environ["OSTREE_REPO"] = args.repo
