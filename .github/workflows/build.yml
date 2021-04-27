@@ -73,11 +73,11 @@ jobs:
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
         with:
           body: ${{ steps.generate-changelog.outputs.changelog }}
           files: |
             dist/holocron-*.tar.gz
             dist/holocron-*.whl
-          prerelease: ${{ ! startsWith(github.ref, 'refs/tags/v') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
