@@ -14,4 +14,4 @@ sdist:
 
 .PHONY: clean
 clean:
-	rm -rf __pycache__ .eggs build dist holocron/__pycache__ *.egg-info
+	rm -rf __pycache__ .eggs build dist precompose/__pycache__ *.egg-info
