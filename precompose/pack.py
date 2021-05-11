@@ -60,7 +60,8 @@ def pull_images(
     compose_yaml: Any, storage: Path, arch: Optional[str], variant: Optional[str]
 ):
     pulls = set([service["image"] for service in compose_yaml["services"].values()])
-    images: Dict[str, str] = {}
+    qualified = {pull: qualify_image(pull) for pull in pulls}
+    image_ids: Dict[str, str] = {}
     pull_args: List[str] = []
 
     if arch is not None:
@@ -70,18 +71,30 @@ def pull_images(
         pull_args += ["--variant", variant]
 
     for pull in pulls:
-        qualified = qualify_image(pull)
-        basename = qualified.rsplit(":", 1)[0]
-        sha256 = capture_output(
+        image_ids[pull] = capture_output(
             "podman",
             "pull",
             "--root",
             str(storage),
             *pull_args,
-            qualified,
+            qualified[pull],
         )
 
-        images[pull] = f"{basename}@sha256:{sha256}"
+    with open(storage.joinpath("overlay-images", "images.json"), "r") as images_in:
+        image_json: List[Dict[str, Any]] = json.load(images_in)
+
+    images: Dict[str, str] = {}
+
+    for pull in pulls:
+        digest: Optional[str] = None
+        for record in image_json:
+            if record["id"] == image_ids[pull]:
+                digest = record["digest"]
+                break
+        if digest is None:
+            raise RuntimeError(f"Couldn't identify image for {pull}")
+        basename = qualified[pull].rsplit(":", 1)[0]
+        images[pull] = f"{basename}@{digest}"
 
     return images
 
