@@ -16,6 +16,13 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
+      - uses: act10ns/slack@v1.2.2
+        with:
+          status: starting
+          channel: "#builds"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.BUILDS_WEBHOOK_URL }}
+
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
@@ -31,6 +38,15 @@ jobs:
             dist/precompose-*.whl
             dist/precompose-*.tar.gz
 
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: "#builds"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.BUILDS_WEBHOOK_URL }}
+        if: always()
+
   release:
     runs-on: ubuntu-20.04
     if: github.event_name == 'push'
@@ -39,6 +55,13 @@ jobs:
       - build
 
     steps:
+      - uses: act10ns/slack@v1.2.2
+        with:
+          status: starting
+          channel: "#builds"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.BUILDS_WEBHOOK_URL }}
+
       - uses: actions/download-artifact@v2
         with:
           path: ./artifacts
@@ -88,3 +111,12 @@ jobs:
             dist/precompose-*.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: act10ns/slack@v1
+        with:
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: "#builds"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.BUILDS_WEBHOOK_URL }}
+        if: always()
