@@ -36,7 +36,6 @@ Your system must be configured in a way that `podman` can operate without root p
 
 `podman` is also needed to run an application packaged with `precompose`, since Docker does not have anything equivalent to an additional image store. It is strongly recommended to use version 3.0 or later of Podman; the APIs used by `docker-compose` are incomplete in earlier versions.
 
-
 ## Installation
 
 Install using pip:
