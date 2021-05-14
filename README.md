@@ -36,6 +36,17 @@ Your system must be configured in a way that `podman` can operate without root p
 
 `podman` is also needed to run an application packaged with `precompose`, since Docker does not have anything equivalent to an additional image store. It is strongly recommended to use version 3.0 or later of Podman; the APIs used by `docker-compose` are incomplete in earlier versions.
 
+
+## Installation
+
+Install using pip:
+
+```bash
+pip3 install precompose
+```
+
+...or, grab the latest release from [GitHub](https://github.com/hello-seam/precompose/releases) or [PyPI](https://pypi.org/project/precompose/) and install it manually.
+
 ## Usage
 
 ```
@@ -54,3 +65,7 @@ optional arguments:
   --arch ARCH        architecture to import
   --variant VARIANT  variant to import
 ```
+
+## Utilities
+
+`precompose_utils` (on [GitHub](https://github.com/hello-seam/precompose_utils) and [PyPI](https://pypi.org/project/precompose-utils/)) contains a set of utilties for working with applications that have been packaged with `precompose`.
