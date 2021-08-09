@@ -11,7 +11,6 @@ Distributing container images through an OSTree repository has some advantages, 
 `precompose` produces an OSTree commit which contains:
 
 - Your original `docker-compose.yml`, rewritten to pin each image to a specific SHA
-- Any `env_file` referenced by your `docker-compose.yml`
 - A directory containing exploded copies of all the containers your application needs, which can be used as an [additional image store](https://www.redhat.com/sysadmin/image-stores-podman) with [Podman](https://podmain.io)
 
 ## Requirements
