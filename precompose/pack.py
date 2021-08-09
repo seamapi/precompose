@@ -122,15 +122,15 @@ def pack(
         storage = tempdir.joinpath("storage")
         storage.mkdir()
         images = pull_images(compose_config, storage, arch, variant)
-        env_files: List[str] = []
+        # env_files: List[str] = []
 
         for name, service in compose_config["services"].items():
             compose_yaml["services"][name]["image"] = images[service["image"]]
-            if "env_file" in compose_yaml["services"][name]:
-                if isinstance(compose_yaml["services"][name]["env_file"], list):
-                    env_files += compose_yaml["services"][name]["env_file"]
-                else:
-                    env_files.append(service["env_file"])
+            # if "env_file" in compose_yaml["services"][name]:
+            #    if isinstance(compose_yaml["services"][name]["env_file"], list):
+            #        env_files += compose_yaml["services"][name]["env_file"]
+            #    else:
+            #        env_files.append(service["env_file"])
 
         app = tempdir.joinpath(compose_path.parent.name)
         app.mkdir()
@@ -139,10 +139,10 @@ def pack(
         with open(new_compose_path, "w") as compose_out:
             cast(Any, yaml).dump(compose_yaml, compose_out)
 
-        for env_file in env_files:
-            shutil.copyfile(
-                compose_path.parent.joinpath(env_file), app.joinpath(env_file)
-            )
+        # for env_file in env_files:
+        #    shutil.copyfile(
+        #        compose_path.parent.joinpath(env_file), app.joinpath(env_file)
+        #    )
 
         metadata = tempdir.joinpath("precompose.json")
         with open(metadata, "w") as metadata_out:
